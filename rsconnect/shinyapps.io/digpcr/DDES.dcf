@@ -1,0 +1,12 @@
+name: DDES
+title: DDES
+username: digpcr
+account: digpcr
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 15846172
+bundleId: 11345700
+url: https://digpcr.shinyapps.io/DDES/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
