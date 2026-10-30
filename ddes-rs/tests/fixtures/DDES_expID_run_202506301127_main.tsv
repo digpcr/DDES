@@ -1,0 +1,14 @@
+#header
+#DDES_version	1.0
+#datetime	202506301127
+#experiment_ID	expID
+#run_ID	5160815c-092d-49ea-946c-cf7bcb49432a
+#DDES_type	main
+#instrument	QIAcuity Four
+#plate_type	Nanoplate 26K 24-well
+#instrument_software_version	QIAcuity Software Suite 2.5.0
+#data
+well_ID	sample_ID	assay_ID	target_ID	counts_positive	counts_negative	concentration_reaction_cp_µL	threshold_if_threshold
+A1	Sample1	HIV Triplex	PSI	4236	21173	241.9	18.88
+A1	Sample1	HIV Triplex	ENV	4456	20920	256.1	19.87
+A1	Sample1	HIV Triplex	GAG	4370	21030	250.4	42.23

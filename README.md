@@ -1,0 +1,28 @@
+# Digital PCR Data Essentials Standard (DDES)
+
+Tools for reading and writing DDES datasets.
+
+- [`ddes-rs/`](ddes-rs/): the Rust core for DDES v1.0.0 main, assays, and
+  endpoint-intensity files. Includes tests, examples, and proposed numeric-field
+  clarifications for the specification.
+- [`archive/`](archive/): the original R/Shiny converter and annotation app,
+  with its demo datasets and deployment metadata preserved.
+
+## Rust core
+
+Run these commands from `ddes-rs/`. Rustup selects the pinned Rust 1.88.0 toolchain.
+
+```sh
+cargo test --locked --all-targets
+cargo test --locked --doc
+cargo run --locked --example roundtrip -- tests/fixtures target/example.ddes
+```
+
+The output archive must not already exist. See the [Rust README](ddes-rs/README.md)
+for API usage, supported data, validation rules, and verification commands.
+The core loads datasets into memory and retains reported scientific results.
+
+Python, TypeScript, and new R bindings are not included yet. The archived R app
+is independent of the Rust core. No CI or release publishing is configured.
+
+License selection remains with DIGPCR; no new license is assigned here.
