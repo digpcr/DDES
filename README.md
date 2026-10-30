@@ -5,6 +5,8 @@ Tools for reading and writing DDES datasets.
 - [`ddes-rs/`](ddes-rs/): the Rust core for DDES v1.0.0 main, assays, and
   endpoint-intensity files. Includes tests, examples, and proposed numeric-field
   clarifications for the specification.
+- [`typescript/`](typescript/): TypeScript/WebAssembly bindings with editable
+  objects, exact bigint counts, and roundtrip and clustering examples.
 - [`archive/`](archive/): the original R/Shiny converter and annotation app,
   with its demo datasets and deployment metadata preserved.
 
@@ -22,7 +24,20 @@ The output archive must not already exist. See the [Rust README](ddes-rs/README.
 for API usage, supported data, validation rules, and verification commands.
 The core loads datasets into memory and retains reported scientific results.
 
-Python, TypeScript, and new R bindings are not included yet. The archived R app
+## TypeScript bindings
+
+Run these commands from `typescript/` with Node 24.2+, Rustup, and wasm-pack installed:
+
+```sh
+npm ci
+npm test
+```
+
+The build produces JS, WASM, and documented TypeScript declarations in `pkg/`.
+See the [TypeScript README](typescript/README.md) for initialization, component
+and archive APIs, ownership, and examples.
+
+Python and new R bindings are not included here. The archived R app
 is independent of the Rust core. No CI or release publishing is configured.
 
 License selection remains with DIGPCR; no new license is assigned here.
