@@ -1,0 +1,25 @@
+[build-system]
+requires = ["maturin>=1.9,<2"]
+build-backend = "maturin"
+
+[project]
+name = "ddes-python"
+version = "0.0.0"
+description = "Python bindings for the Digital PCR Data Essentials Standard"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+
+[dependency-groups]
+dev = ["maturin>=1.9,<2", "mypy>=1.19,<2"]
+examples = ["scikit-learn>=1.6,<2"]
+
+[tool.maturin]
+python-source = "python"
+module-name = "ddes._native"
+locked = true
+exclude = ["**/__pycache__/**", "**/*.pyc"]
+
+[tool.mypy]
+strict = true
+files = ["tests/check_types.py", "examples/roundtrip.py"]

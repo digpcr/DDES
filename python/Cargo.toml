@@ -1,0 +1,15 @@
+[package]
+name = "ddes-python"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.88"
+publish = false
+description = "Python bindings for the Digital PCR Data Essentials Standard"
+
+[lib]
+name = "_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+ddes = { package = "ddes-rs", path = "../ddes-rs" }
+pyo3 = { version = "0.29", features = ["extension-module"] }
