@@ -1,0 +1,10 @@
+STATLIB = rust/target/release/libddes_r.a
+PKG_LIBS = $(STATLIB) -lpthread -ldl -lm
+
+all: $(SHLIB)
+
+$(SHLIB): $(STATLIB)
+
+.PHONY: $(STATLIB)
+$(STATLIB):
+	cargo build --locked --release --lib --manifest-path=rust/Cargo.toml --target-dir=rust/target

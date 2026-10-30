@@ -1,0 +1,11 @@
+TARGET = x86_64-pc-windows-gnu
+STATLIB = rust/target/$(TARGET)/release/libddes_r.a
+PKG_LIBS = $(STATLIB) -lws2_32 -ladvapi32 -luserenv -lbcrypt -lntdll
+
+all: $(SHLIB)
+
+$(SHLIB): $(STATLIB)
+
+.PHONY: $(STATLIB)
+$(STATLIB):
+	cargo build --locked --release --lib --target=$(TARGET) --manifest-path=rust/Cargo.toml --target-dir=rust/target

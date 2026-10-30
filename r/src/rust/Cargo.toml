@@ -1,0 +1,14 @@
+[package]
+name = "ddes-r"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.88"
+publish = false
+description = "R bindings for DDES datasets"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+ddes = { package = "ddes-rs", path = "../../../ddes-rs" }
+extendr-api = { version = "0.9", features = ["result_condition"] }
