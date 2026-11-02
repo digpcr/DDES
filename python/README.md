@@ -179,3 +179,16 @@ cargo clippy --locked --all-targets -- -D warnings
 The tests exercise the installed extension, run its docstring examples, and
 check archive round trips with the Rust library. Temporary output files are
 removed after each test.
+
+## Continuous integration
+
+[Python CI](../.github/workflows/python.yml) builds and installs CPython 3.12
+wheels on Linux x86-64, macOS arm64, and Windows x64. Tests and stubtest run
+against the installed wheel, alongside mypy, Rust formatting, Clippy, and
+rustdoc checks. Linux also runs the clustering tests and example type check.
+Require `Python checks` alongside `Rust checks` in branch rules.
+
+Wheels are retained for 14 days but are not published. The Linux wheel uses a
+native platform tag, not a portable manylinux/musllinux build; this is not the
+public release matrix. Dependabot proposes weekly Cargo and uv updates.
+See [CI checks](../ci/README.md) for shared checks and publishing prerequisites.
