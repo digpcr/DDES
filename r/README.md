@@ -171,4 +171,33 @@ cargo clippy --locked --manifest-path src/rust/Cargo.toml --all-targets -- -D wa
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --manifest-path src/rust/Cargo.toml --no-deps
 ```
 
+## Continuous integration
+
+[R CI](../.github/workflows/r.yml) installs the package with R 4.5.2 on Linux
+x86-64, macOS arm64, and Windows x64. It runs binding tests, help examples, and
+the roundtrip example, checks Rust formatting/Clippy/rustdoc, and builds and
+reinstalls an R binary package in a fresh library. Linux also runs Shiny server
+tests, Chromium upload/edit/download/session-isolation checks, and clustering.
+Require `R checks` alongside `Rust checks` in branch rules.
+
+From the repository root, after installing the R package and test dependencies:
+
+```sh
+Rscript ci/r-check.R
+Rscript ci/r-artifact.R
+npm ci --prefix ci
+npm exec --prefix ci -- playwright install chromium
+node ci/shiny-smoke.mjs
+```
+
+Browser checks need `testthat`, `shiny`, and `rhandsontable`, Node 24.2+, and
+Rustup. On Linux use Playwright's `install --with-deps chromium` to install
+system libraries too. The browser check starts and stops its own server.
+
+Binary artifacts are retained for 14 days and are not published. They are tied
+to their OS, architecture, and R version; these checks are not a CRAN submission
+check. R test dependencies are not locked. Dependabot proposes weekly updates
+for Cargo and the npm browser-test dependencies. See [CI checks](../ci/README.md)
+for shared checks and publishing prerequisites.
+
 License selection remains with DIGPCR; no new license is assigned here.

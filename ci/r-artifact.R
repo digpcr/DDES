@@ -1,0 +1,32 @@
+# Build an R binary package, then install and exercise it in a fresh library.
+root <- normalizePath(".", mustWork = TRUE)
+dir.create("dist/r", recursive = TRUE, showWarnings = FALSE)
+output <- normalizePath("dist/r", mustWork = TRUE)
+check_artifact <- function() {
+  scratch <- tempfile("ddes-r-artifact-")
+  dir.create(scratch)
+  on.exit(unlink(scratch, recursive = TRUE), add = TRUE)
+  build_lib <- file.path(scratch, "build")
+  installed_lib <- file.path(scratch, "installed")
+  dir.create(build_lib)
+  dir.create(installed_lib)
+  old <- setwd(output)
+  on.exit(setwd(old), add = TRUE)
+  r <- file.path(R.home("bin"), "R")
+  status <- system2(r, c("CMD", "INSTALL", "--build", "--preclean",
+    paste0("--library=", shQuote(build_lib)), shQuote(file.path(root, "r"))))
+  stopifnot(status == 0L)
+  artifact <- list.files(output, pattern = "^ddes_.*\\.(zip|tgz|tar\\.gz)$", full.names = TRUE)
+  stopifnot(length(artifact) == 1L)
+  status <- system2(r, c("CMD", "INSTALL", paste0("--library=", shQuote(installed_lib)), shQuote(artifact)))
+  stopifnot(status == 0L)
+  library(ddes, lib.loc = installed_lib)
+  on.exit(detach("package:ddes", unload = TRUE), add = TRUE, after = FALSE)
+  stopifnot(normalizePath(find.package("ddes")) == normalizePath(file.path(installed_lib, "ddes")))
+  x <- read_archive(file.path(root, "ddes-rs/tests/contract"))
+  stopifnot(identical(x$main$records$counts_positive,
+    c("9007199254740993", "18446744073709551615", NA_character_)))
+  stopifnot(identical(archive_from_raw(archive_to_raw(x)), x))
+  message("Installed and verified R artifact: ", basename(artifact))
+}
+check_artifact()
