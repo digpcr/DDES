@@ -320,13 +320,48 @@ fn reordered_columns_and_quoted_identifiers_survive() {
         file
     );
     let mut main = fixture().main;
-    main.records[0].sample_id = "a \"quoted\" sample\twith\na newline".into();
+    main.records[0].sample_id = "a \"quoted\" sample\twith\r\n# a newline".into();
     main.metadata.instrument = "Lab \"instrument\" #1".into();
     let path = std::path::PathBuf::from("not-opened.tsv");
     assert_eq!(
         MainFile::from_tsv(&path, &main.to_tsv(&path).unwrap()).unwrap(),
         main
     );
+}
+
+#[test]
+fn table_errors_identify_record_start_lines() {
+    let header = INTENSITY.split_once("partition_ID").unwrap().0;
+    let prefix = format!(
+        "{header}partition_ID\tchannel_ID\tFI_endpoint\n\"α\n# inside ID\"\tGREEN\t1\n\n# comment\n\n"
+    );
+    let cases = [
+        ("main.tsv", MAIN.replacen("4236\t21173", "4236", 1), 12),
+        ("main.tsv", MAIN.replacen("4370", "invalid", 1), 14),
+        ("assays.tsv", ASSAYS.replace("125;125;125", "-1"), 10),
+        ("intensity.tsv", INTENSITY.replacen("34.65", "NA", 1), 11),
+        ("intensity.tsv", format!("{prefix}002\tGREEN"), 16),
+        ("intensity.tsv", format!("{prefix}002\tGREEN\tNA\n"), 16),
+        (
+            "intensity.tsv",
+            format!("{prefix}\"002\n# inside ID\"\tGREEN\tNA\n"),
+            16,
+        ),
+    ];
+    for ending in ["\r\n", "\n"] {
+        for (name, input, expected_line) in &cases {
+            let input = input.replace('\n', ending);
+            let error = match *name {
+                "main.tsv" => MainFile::from_tsv(name, input.as_bytes()).unwrap_err(),
+                "assays.tsv" => AssaysFile::from_tsv(name, input.as_bytes()).unwrap_err(),
+                _ => IntensityFile::from_tsv(name, input.as_bytes()).unwrap_err(),
+            };
+            assert!(
+                matches!(&error, Error::Format { file, line, .. } if file == name && line == expected_line),
+                "{ending:?}: expected line {expected_line}, got {error}"
+            );
+        }
+    }
 }
 
 #[test]
