@@ -1,7 +1,5 @@
 //! Shared UTF-8, metadata, and TSV table parsing and encoding.
 
-use std::io::Read;
-
 use csv::{QuoteStyle, ReaderBuilder, StringRecord, WriterBuilder};
 use serde::{Serialize, de::DeserializeOwned};
 
@@ -52,18 +50,29 @@ pub(crate) fn metadata_field(
 /// Read the ordinary TSV table after a file module has consumed its header.
 pub(crate) fn read_records<T: DeserializeOwned>(
     file: &str,
-    input: impl Read,
+    input: &[u8],
     lines: usize,
     trim_columns: &[&str],
 ) -> Result<Vec<T>> {
+    let table_error = |error: csv::Error| {
+        // CSV positions precede skipped input, including the LF half of CRLF.
+        // Count only leading empty/comment lines, never newlines inside a row.
+        let skipped_lines = error.position().map_or(0, |position| {
+            input[position.byte() as usize..]
+                .split_inclusive(|&byte| byte == b'\n')
+                .take_while(|line| {
+                    line.starts_with(b"#") || line.iter().all(|byte| matches!(byte, b'\r' | b'\n'))
+                })
+                .filter(|line| line.ends_with(b"\n"))
+                .count()
+        });
+        csv_error(file, lines + skipped_lines, error)
+    };
     let mut reader = ReaderBuilder::new()
         .delimiter(b'\t')
         .comment(Some(b'#'))
         .from_reader(input);
-    let columns = reader
-        .headers()
-        .map_err(|e| csv_error(file, lines, e))?
-        .clone();
+    let columns = reader.headers().map_err(table_error)?.clone();
     // Check even an empty table: deserializing rows alone cannot check its header.
     let expected_columns = field_names::<T>();
     for (index, column) in columns.iter().enumerate() {
@@ -99,7 +108,7 @@ pub(crate) fn read_records<T: DeserializeOwned>(
     reader
         .records()
         .map(|row| {
-            let row = row.map_err(|e| csv_error(file, lines, e))?;
+            let row = row.map_err(table_error)?;
             // Normalize only the file module's numeric columns, never identifiers.
             let mut normalized;
             let row = if trim_columns.is_empty() {
@@ -119,8 +128,7 @@ pub(crate) fn read_records<T: DeserializeOwned>(
                 normalized.set_position(row.position().cloned());
                 &normalized
             };
-            row.deserialize(Some(&columns))
-                .map_err(|e| csv_error(file, lines, e))
+            row.deserialize(Some(&columns)).map_err(table_error)
         })
         .collect()
 }
