@@ -1,0 +1,59 @@
+name: TypeScript CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '23 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RUSTUP_TOOLCHAIN: ${{ github.event_name == 'schedule' && 'stable' || '1.88.0' }}
+  CARGO_TERM_COLOR: always
+  RUSTDOCFLAGS: -D warnings
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  typescript:
+    name: TypeScript checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24.11.0'
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+      - run: |
+          rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal --component rustfmt --component clippy --target wasm32-unknown-unknown
+          cargo install wasm-pack --version 0.13.1 --locked
+      - working-directory: typescript
+        run: |
+          npm ci
+          cargo fmt --check
+          cargo clippy --locked --target wasm32-unknown-unknown --all-targets -- -D warnings
+          cargo doc --locked --target wasm32-unknown-unknown --no-deps
+          wasm-pack build --release --target web --out-dir pkg -- --locked
+          npm run test:types
+          npm run test:runtime
+      - run: node ci/npm-artifact.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: npm-package
+          path: dist/npm/*.tgz
+          if-no-files-found: error
+          retention-days: 14

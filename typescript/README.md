@@ -196,4 +196,16 @@ RUSTDOCFLAGS='-D warnings' cargo doc --locked --target wasm32-unknown-unknown --
 and runs runtime tests in Node, including native Rust ↔ WASM archive round trips.
 Temporary test output is removed afterward.
 
+## Continuous integration
+
+[TypeScript CI](../.github/workflows/typescript.yml) builds release WASM, runs
+type/runtime tests, and checks Rust formatting, Clippy, and rustdoc on Linux
+with Node 24.11.0. It installs the packed npm tarball in a temporary directory
+and tests both runtime imports and a TypeScript consumer. Require
+`TypeScript checks` alongside `Rust checks` in branch rules.
+
+The npm tarball is retained for 14 days and is not published. Dependabot proposes
+weekly Cargo and npm updates. See [CI checks](../ci/README.md) for shared checks
+and publishing prerequisites.
+
 License selection remains with DIGPCR; no new license is assigned here.
