@@ -1,0 +1,14 @@
+#header
+#DDES_version	1.0.0
+#datetime	202601011200
+#experiment_ID	contract
+#run_ID	run
+#DDES_type	intensity
+#well_ID	A1
+#assay_ID	01
+#data
+partition_ID	channel_ID	FI_endpoint
+001	GREEN	-0.5
+002	GREEN	0
+001	RED	100.25
+002	RED	2.5

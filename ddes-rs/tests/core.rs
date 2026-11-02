@@ -27,6 +27,44 @@ fn read_zip(bytes: Vec<u8>) -> ddes::Result<Dataset> {
 }
 
 #[test]
+fn shared_binding_contract() {
+    let dataset =
+        Dataset::read_path(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/contract")).unwrap();
+    let rows = &dataset.main.records;
+    assert_eq!(rows.len(), 3);
+    assert_eq!(rows[0].counts_positive, Some(9_007_199_254_740_993));
+    assert_eq!(rows[1].counts_positive, Some(u64::MAX));
+    assert_eq!(rows[2].counts_positive, None);
+    assert_eq!(rows[0].counts_negative, Some(0));
+    assert_eq!(rows[1].counts_negative, None);
+    assert_eq!(rows[2].counts_negative, Some(17));
+    assert_eq!(rows[0].concentration_reaction_cp_ul, Some(0.0));
+    assert_eq!(rows[1].concentration_reaction_cp_ul, None);
+    assert_eq!(rows[2].concentration_reaction_cp_ul, Some(1.25));
+    assert_eq!(rows[0].threshold_if_threshold, Some(-1.5));
+    assert_eq!(rows[1].threshold_if_threshold, None);
+    assert_eq!(rows[2].threshold_if_threshold, Some(0.0));
+    assert_eq!(rows[0].sample_id, "001");
+    assert_eq!(rows[2].sample_id, "µ-sample");
+    assert_eq!(dataset.assays.records[0].probe_concentrations_nm, "NA");
+    assert_eq!(
+        dataset.assays.records[1].probe_concentrations_nm,
+        "125;NA;0"
+    );
+    let records = &dataset.intensities[0].records;
+    assert_eq!(records[0].partition_id, "001");
+    assert_eq!(records[0].fi_endpoint, -0.5);
+    assert_eq!(records[1].fi_endpoint, 0.0);
+    assert_eq!(records[2].fi_endpoint, 100.25);
+    assert_eq!(records[3].fi_endpoint, 2.5);
+    let bytes = dataset
+        .write_zip(Cursor::new(Vec::new()))
+        .unwrap()
+        .into_inner();
+    assert_eq!(read_zip(bytes).unwrap(), dataset);
+}
+
+#[test]
 fn reference_values_and_archive_roundtrip() {
     let dataset = fixture();
     assert_eq!(dataset.main.metadata.ddes_version, "1.0");

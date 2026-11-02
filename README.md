@@ -37,7 +37,11 @@ The distribution is named `ddes-python`; import it as `ddes`. See the
 [Python README](python/README.md) for API usage, the clustering example,
 and development checks.
 
-TypeScript and new R bindings are not included yet. The archived R app
-is independent of the Rust core. No CI or release publishing is configured.
+## CI and releases
+
+CI checks the Rust core on Linux, macOS, and Windows and verifies a source
+package on Linux. See [CI checks](ci/README.md) for commands, coverage, required
+statuses, and publishing prerequisites. Contributor guidance is in [AGENTS.md](AGENTS.md).
+Publishing is disabled; CI artifacts are for testing, not public distribution.
 
 License selection remains with DIGPCR; no new license is assigned here.
