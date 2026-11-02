@@ -1,0 +1,14 @@
+#header
+#DDES_version	1.0.0
+#datetime	202601011200
+#experiment_ID	contract
+#run_ID	run
+#DDES_type	main
+#instrument	test
+#plate_type	96
+#instrument_software_version	1
+#data
+well_ID	sample_ID	assay_ID	target_ID	counts_positive	counts_negative	concentration_reaction_cp_µL	threshold_if_threshold
+A1	001	01	alpha	9007199254740993	0	0	-1.5
+A1	001	01	beta	18446744073709551615	NA	NA	NA
+A2	µ-sample	02	gamma	NA	17	1.25	0

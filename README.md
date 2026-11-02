@@ -22,7 +22,11 @@ The output archive must not already exist. See the [Rust README](ddes-rs/README.
 for API usage, supported data, validation rules, and verification commands.
 The core loads datasets into memory and retains reported scientific results.
 
-Python, TypeScript, and new R bindings are not included yet. The archived R app
-is independent of the Rust core. No CI or release publishing is configured.
+## CI and releases
+
+CI checks the Rust core on Linux, macOS, and Windows and verifies a source
+package on Linux. See [CI checks](ci/README.md) for commands, coverage, required
+statuses, and publishing prerequisites. Contributor guidance is in [AGENTS.md](AGENTS.md).
+Publishing is disabled; CI artifacts are for testing, not public distribution.
 
 License selection remains with DIGPCR; no new license is assigned here.
