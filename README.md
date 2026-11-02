@@ -39,4 +39,11 @@ installation requirements, and development checks.
 The [Shiny example](r/examples/shiny/README.md) provides a browser interface
 for conversion, annotation, inspection, and DDES downloads using the R bindings.
 
+## CI and releases
+
+CI checks the Rust core on Linux, macOS, and Windows and verifies a source
+package on Linux. See [CI checks](ci/README.md) for commands, coverage, required
+statuses, and publishing prerequisites. Contributor guidance is in [AGENTS.md](AGENTS.md).
+Publishing is disabled; CI artifacts are for testing, not public distribution.
+
 License selection remains with DIGPCR; no new license is assigned here.
