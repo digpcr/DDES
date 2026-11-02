@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Tests construct CRLF inputs explicitly; keep their source fixtures canonical.
+ddes-rs/tests/**/*.tsv text eol=lf
