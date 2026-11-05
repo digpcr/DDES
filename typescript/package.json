@@ -1,0 +1,20 @@
+{
+  "name": "ddes-typescript",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "wasm-pack build --dev --target web --out-dir pkg -- --locked",
+    "test:types": "tsc --noEmit -p tests/tsconfig.json",
+    "test:runtime": "node --test tests/*.test.mjs",
+    "test": "npm run build && npm run test:types && npm run test:runtime"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "ml-kmeans": "^7.0.1",
+    "typescript": "~6.0.3"
+  },
+  "engines": {
+    "node": ">=24.2"
+  }
+}
