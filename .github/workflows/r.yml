@@ -1,0 +1,119 @@
+name: R CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '23 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RUSTUP_TOOLCHAIN: ${{ github.event_name == 'schedule' && 'stable' || '1.88.0' }}
+  CARGO_TERM_COLOR: always
+  RUSTDOCFLAGS: -D warnings
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  r:
+    name: R (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          r-version: '4.5.2'
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          working-directory: r
+          packages: any::testthat
+      - run: rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal --component rustfmt --component clippy
+      - if: runner.os == 'Windows'
+        run: rustup target add x86_64-pc-windows-gnu
+      - run: R CMD INSTALL r
+      - working-directory: r
+        run: |
+          target=()
+          if [ "$RUNNER_OS" = Windows ]; then target=(--target x86_64-pc-windows-gnu); fi
+          cargo fmt --manifest-path src/rust/Cargo.toml --check
+          cargo clippy --locked --manifest-path src/rust/Cargo.toml "${target[@]}" --all-targets -- -D warnings
+          cargo doc --locked --manifest-path src/rust/Cargo.toml "${target[@]}" --no-deps
+      - run: Rscript ci/r-check.R
+      - run: Rscript r/examples/roundtrip.R ddes-rs/tests/contract
+      - run: Rscript ci/r-artifact.R
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: r-binary-${{ matrix.os }}
+          path: dist/r/*
+          if-no-files-found: error
+          retention-days: 14
+
+  shiny:
+    name: Shiny
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24.11.0'
+      - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          r-version: '4.5.2'
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          working-directory: r
+          packages: any::testthat, any::shiny, any::rhandsontable
+      - run: |
+          rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal
+          R CMD INSTALL r
+      - run: |
+          Rscript r/examples/shiny/tests.R
+          Rscript r/examples/clustering.R ddes-rs/tests/fixtures 2
+          npm ci --prefix ci
+          npm exec --prefix ci -- playwright install --with-deps chromium
+          node ci/shiny-smoke.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: shiny-browser-evidence
+          path: .amp/in/artifacts/ci/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14
+
+  required:
+    name: R checks
+    if: always()
+    needs: [r, shiny]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every job to succeed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for result in $RESULTS; do
+            test "$result" = success || exit 1
+          done

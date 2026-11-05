@@ -9,8 +9,11 @@ Tools for reading and writing DDES datasets.
   archives, with editable classes, type hints, and roundtrip and clustering examples.
 - [`typescript/`](typescript/): TypeScript/WebAssembly bindings with editable
   objects, exact bigint counts, and roundtrip and clustering examples.
-- [`archive/`](archive/): the original R/Shiny converter and annotation app,
-  with its demo datasets and deployment metadata preserved.
+- [`r/`](r/): R bindings with editable lists and data frames, component and
+  archive I/O, roundtrip and clustering examples, and a Shiny converter and
+  annotation app.
+- [`archive/`](archive/): the reference R/Shiny converter and annotation app
+  and its demo datasets.
 
 ## Rust core
 
@@ -51,6 +54,20 @@ npm test
 The build produces JS, WASM, and documented TypeScript declarations in `pkg/`.
 See the [TypeScript README](typescript/README.md) for initialization, component
 and archive APIs, ownership, and examples.
+
+## R bindings
+
+From the repository root with R 4.2+, Rustup, Cargo, and C build tools installed:
+
+```sh
+R CMD INSTALL r
+Rscript r/examples/roundtrip.R ddes-rs/tests/fixtures
+```
+
+See the [R README](r/README.md) for API usage, exact counts, validation,
+installation requirements, and development checks.
+The [Shiny example](r/examples/shiny/README.md) provides a browser interface
+for conversion, annotation, inspection, and DDES downloads using the R bindings.
 
 ## CI and releases
 
