@@ -1,0 +1,19 @@
+#head
+#DDES_version	1.0
+#datetime	202506301127
+#experiment_ID	expID
+#run_ID	5160815c-092d-49ea-946c-cf7bcb49432a
+#DDES_type	intensity
+#well_ID	A1
+#assay_ID	HIV Triplex
+#data
+partition_ID	channel_ID	FI_endpoint
+9	CRIMSON	34.65
+10	CRIMSON	60.84
+11	CRIMSON	62.14
+9	GREEN	14.71
+10	GREEN	35.11
+11	GREEN	37.9
+9	YELLOW	13.65
+10	YELLOW	13.66
+11	YELLOW	30.09

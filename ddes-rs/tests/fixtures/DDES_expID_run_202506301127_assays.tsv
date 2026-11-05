@@ -1,0 +1,10 @@
+#header
+#DDES_version	1.0
+#datetime	202506301127
+#experiment_ID	expID
+#run_ID	5160815c-092d-49ea-946c-cf7bcb49432a
+#DDES_type	assays
+#data
+#assay_information
+assay_ID	probe_combination	probe_concentrations_nM
+HIV Triplex	PSI.GREEN;ENV.YELLOW;GAG.CRIMSON	125;125;125
