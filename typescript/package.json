@@ -10,7 +10,7 @@
     "test": "npm run build && npm run test:types && npm run test:runtime"
   },
   "devDependencies": {
-    "@types/node": "^24",
+    "@types/node": "^26",
     "ml-kmeans": "^7.0.1",
     "typescript": "~6.0.3"
   },
