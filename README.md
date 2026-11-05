@@ -7,6 +7,8 @@ Tools for reading and writing DDES datasets.
   clarifications for the specification.
 - [`python/`](python/): Python bindings for all three component types and
   archives, with editable classes, type hints, and roundtrip and clustering examples.
+- [`typescript/`](typescript/): TypeScript/WebAssembly bindings with editable
+  objects, exact bigint counts, and roundtrip and clustering examples.
 - [`archive/`](archive/): the original R/Shiny converter and annotation app,
   with its demo datasets and deployment metadata preserved.
 
@@ -36,6 +38,19 @@ uv run --locked python examples/roundtrip.py ../ddes-rs/tests/fixtures
 The distribution is named `ddes-python`; import it as `ddes`. See the
 [Python README](python/README.md) for API usage, the clustering example,
 and development checks.
+
+## TypeScript bindings
+
+Run these commands from `typescript/` with Node 24.2+, Rustup, and wasm-pack installed:
+
+```sh
+npm ci
+npm test
+```
+
+The build produces JS, WASM, and documented TypeScript declarations in `pkg/`.
+See the [TypeScript README](typescript/README.md) for initialization, component
+and archive APIs, ownership, and examples.
 
 ## CI and releases
 

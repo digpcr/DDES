@@ -1,0 +1,21 @@
+[package]
+name = "ddes-typescript"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.88"
+publish = false
+description = "TypeScript and WebAssembly bindings for the DDES Rust core"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ddes = { package = "ddes-rs", path = "../ddes-rs" }
+js-sys = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde-wasm-bindgen = "0.6"
+tsify = { version = "0.5", default-features = false, features = ["js"] }
+wasm-bindgen = "0.2"
+
+[package.metadata.wasm-pack.profile.dev]
+wasm-opt = false
